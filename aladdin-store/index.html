@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر علاء الدين</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; padding: 20px; }
+        header { background: #2c3e50; color: #fff; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { font-size: 20px; }
+        .container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        .card { background: #fff; border-radius: 8px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .product-card { border: 1px solid #ddd; padding: 10px; border-radius: 6px; text-align: center; background: #fff; }
+        .product-card h4 { margin: 8px 0; }
+        .product-card p { color: #27ae60; font-weight: bold; margin-bottom: 10px; }
+        button { background: #27ae60; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        button:hover { opacity: 0.9; }
+        button.danger { background: #e74c3c; }
+        input { width: 100%; padding: 8px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 4px; }
+        ul { list-style: none; }
+        li { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>💎 متجر علاء الدين</h1>
+        <div>السلة: <span id="cart-count">0</span> منتج</div>
+    </header>
+
+    <div class="container">
+        <!-- قسم عرض المنتجات والسلة -->
+        <div>
+            <div class="card">
+                <h3>المنتجات المتاحة</h3>
+                <br>
+                <div class="products-grid" id="products-list"></div>
+            </div>
+        </div>
+
+        <!-- لوحة التحكم والسلة -->
+        <div>
+            <!-- سلة المشتريات -->
+            <div class="card">
+                <h3>سلة المشتريات</h3>
+                <ul id="cart-items"></ul>
+                <br>
+                <strong>الإجمالي: <span id="total-price">0</span> د.ج</strong>
+            </div>
+
+            <!-- لوحة إضافة منتج جديد (Admin) -->
+            <div class="card">
+                <h3>إضافة منتج جديد (لوحة التحكم)</h3>
+                <label>اسم المنتج:</label>
+                <input type="text" id="p-name" placeholder="مثال: مصباح سحري">
+                
+                <label>السعر (د.ج):</label>
+                <input type="number" id="p-price" placeholder="مثال: 2500">
+                
+                <button onclick="addProduct()">إضافة للمتجر</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // تحميل المنتجات والسلة من LocalStorage
+        let products = JSON.parse(localStorage.getItem('aladdin_products')) || [
+            { id: 1, name: "بساط سحري", price: 5000 },
+            { id: 2, name: "مصباح علاء الدين", price: 3500 }
+        ];
+        let cart = JSON.parse(localStorage.getItem('aladdin_cart')) || [];
+
+        function saveData() {
+            localStorage.setItem('aladdin_products', JSON.stringify(products));
+            localStorage.setItem('aladdin_cart', JSON.stringify(cart));
+        }
+
+        function renderProducts() {
+            const list = document.getElementById('products-list');
+            list.innerHTML = '';
+            products.forEach(p => {
+                list.innerHTML += `
+                    <div class="product-card">
+                        <h4>${p.name}</h4>
+                        <p>${p.price} د.ج</p>
+                        <button onclick="addToCart(${p.id})">إضافة للسلة</button>
+                        <button class="danger" style="margin-top:5px;" onclick="deleteProduct(${p.id})">حذف</button>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCart() {
+            const cartList = document.getElementById('cart-items');
+            const totalSpan = document.getElementById('total-price');
+            const countSpan = document.getElementById('cart-count');
+            
+            cartList.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                total += item.price;
+                cartList.innerHTML += `
+                    <li>
+                        ${item.name} - ${item.price} د.ج
+                        <button class="danger" onclick="removeFromCart(${index})">X</button>
+                    </li>
+                `;
+            });
+
+            totalSpan.innerText = total;
+            countSpan.innerText = cart.length;
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            if(product) {
+                cart.push(product);
+                saveData();
+                renderCart();
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            saveData();
+            renderCart();
+        }
+
+        function addProduct() {
+            const nameInput = document.getElementById('p-name');
+            const priceInput = document.getElementById('p-price');
+
+            if(nameInput.value && priceInput.value) {
+                const newProduct = {
+                    id: Date.now(),
+                    name: nameInput.value,
+                    price: parseFloat(priceInput.value)
+                };
+                products.push(newProduct);
+                saveData();
+                renderProducts();
+                nameInput.value = '';
+                priceInput.value = '';
+            } else {
+                alert('يرجى إدخال اسم المنتج والسعر');
+            }
+        }
+
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            saveData();
+            renderProducts();
+        }
+
+        // تشغيل البداية
+        renderProducts();
+        renderCart();
+    </script>
+</body>
+</html>
+
