@@ -1,66 +1,237 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>متجر M.S.F الترويجي</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .header {
-      background: #fff;
-      padding: 15px 30px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-    }
-    .card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      max-width: 400px;
-      text-align: center;
-    }
-    .btn-buy {
-      display: inline-block;
-      background-color: #e62e04;
-      color: #fff;
-      padding: 12px 25px;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 8px;
-      margin-top: 15px;
-      transition: background 0.3s;
-    }
-    .btn-buy:hover {
-      background-color: #cc2900;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر علاء الدين</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            color: #333; 
+            padding: 20px; 
+            min-height: 100vh;
+        }
+        header { 
+            background: linear-gradient(135deg, #2c3e50, #3498db); 
+            color: #fff; 
+            padding: 20px; 
+            border-radius: 12px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 { font-size: 22px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        .container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        
+        .card { 
+            background: #fff; 
+            border-radius: 12px; 
+            padding: 20px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            margin-bottom: 20px; 
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        
+        .product-card { 
+            border: 1px solid #e1e8ed; 
+            padding: 15px; 
+            border-radius: 10px; 
+            text-align: center; 
+            background: #ffffff; 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+        }
+        .product-card h4 { margin: 8px 0; color: #2c3e50; }
+        .product-card p { color: #27ae60; font-weight: bold; margin-bottom: 12px; font-size: 16px; }
+        
+        .btn-group { display: flex; gap: 5px; justify-content: center; margin-top: 5px; flex-wrap: wrap; }
+        button { background: #27ae60; color: #fff; border: none; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; transition: opacity 0.2s; }
+        button:hover { opacity: 0.85; }
+        button.danger { background: #e74c3c; }
+        button.warning { background: #f39c12; }
+        
+        input { width: 100%; padding: 10px; margin: 6px 0 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; background: #fafafa; }
+        ul { list-style: none; }
+        li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+        
+        .badge { background: #e74c3c; color: white; padding: 3px 8px; border-radius: 20px; font-size: 12px; }
+    </style>
 </head>
 <body>
 
-  <div class="header">
-    <h2>متجر M.S.F الترويجي</h2>
-  </div>
+    <header>
+        <h1>💎 متجر علاء الدين</h1>
+        <div>السلة: <span id="cart-count" class="badge">0</span> منتج</div>
+    </header>
 
-  <div class="card">
-    <h3>جهاز العرض السينمائي (DataShow Smart HD)</h3>
-    <p>استمتع بتجربة سينمائية فريدة في المنزل شاشة عرض عالية الدقة ومناسبة لمشاهدة المباريات والأفلام بأعلى جودة</p>
-    
-    <!-- زر الشراء مضاف إليه الرابط المطلوب -->
-    <a href="https://kadidakya.github.io/abdelkader-M.s.F-/" target="_blank" class="btn-buy">
-      اشترِ الآن من AliExpress
-    </a>
-  </div>
+    <div class="container">
+        <!-- قسم المنتجات المتاحة -->
+        <div>
+            <div class="card">
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">📦 المنتجات المتاحة في المتجر</h3>
+                <div class="products-grid" id="products-list"></div>
+            </div>
+        </div>
 
+        <!-- قسم السلة ولوحة التحكم -->
+        <div>
+            <!-- سلة المشتريات -->
+            <div class="card">
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">🛒 سلة المشتريات</h3>
+                <ul id="cart-items"></ul>
+                <br>
+                <div style="font-size: 18px; color: #2c3e50;">
+                    <strong>الإجمالي: <span id="total-price" style="color: #27ae60;">0</span> د.ج</strong>
+                </div>
+            </div>
+
+            <!-- لوحة إضافة وإدارة المنتجات -->
+            <div class="card">
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">⚙️ لوحة التحكم</h3>
+                <label>اسم المنتج:</label>
+                <input type="text" id="p-name" placeholder="مثال: مصباح سحري">
+                
+                <label>السعر (د.ج):</label>
+                <input type="number" id="p-price" placeholder="مثال: 2500">
+                
+                <button onclick="addProduct()" style="width: 100%; padding: 12px; background: #3498db; font-size: 15px;">إضافة للمتجر</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let products = JSON.parse(localStorage.getItem('aladdin_products')) || [
+            { id: 1, name: "بساط سحري", price: 5000 },
+            { id: 2, name: "مصباح علاء الدين", price: 3500 }
+        ];
+        let cart = JSON.parse(localStorage.getItem('aladdin_cart')) || [];
+
+        function saveData() {
+            localStorage.setItem('aladdin_products', JSON.stringify(products));
+            localStorage.setItem('aladdin_cart', JSON.stringify(cart));
+        }
+
+        function renderProducts() {
+            const list = document.getElementById('products-list');
+            list.innerHTML = '';
+            products.forEach(p => {
+                list.innerHTML += `
+                    <div class="product-card">
+                        <h4>${p.name}</h4>
+                        <p>${p.price} د.ج</p>
+                        <div class="btn-group">
+                            <button onclick="addToCart(${p.id})">شراء</button>
+                            <button class="warning" onclick="editProduct(${p.id})">تعديل</button>
+                            <button class="danger" onclick="deleteProduct(${p.id})">حذف</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCart() {
+            const cartList = document.getElementById('cart-items');
+            const totalSpan = document.getElementById('total-price');
+            const countSpan = document.getElementById('cart-count');
+            
+            cartList.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p style="color: #888; text-align: center; padding: 10px;">السلة فارغة</p>';
+            }
+
+            cart.forEach((item, index) => {
+                total += item.price;
+                cartList.innerHTML += `
+                    <li>
+                        <span>${item.name}</span>
+                        <span>
+                            <b>${item.price} د.ج</b>
+                            <button class="danger" style="padding: 2px 6px; margin-right: 5px;" onclick="removeFromCart(${index})">X</button>
+                        </span>
+                    </li>
+                `;
+            });
+
+            totalSpan.innerText = total;
+            countSpan.innerText = cart.length;
+        }
+
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            if(product) {
+                cart.push(product);
+                saveData();
+                renderCart();
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            saveData();
+            renderCart();
+        }
+
+        function addProduct() {
+            const nameInput = document.getElementById('p-name');
+            const priceInput = document.getElementById('p-price');
+
+            if(nameInput.value && priceInput.value) {
+                const newProduct = {
+                    id: Date.now(),
+                    name: nameInput.value,
+                    price: parseFloat(priceInput.value)
+                };
+                products.push(newProduct);
+                saveData();
+                renderProducts();
+                nameInput.value = '';
+                priceInput.value = '';
+            } else {
+                alert('يرجى إدخال اسم المنتج والسعر');
+            }
+        }
+
+        function editProduct(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            const newName = prompt("تعديل اسم المنتج:", product.name);
+            if (newName === null) return; // إلغاء
+
+            const newPrice = prompt("تعديل سعر المنتج (د.ج):", product.price);
+            if (newPrice === null) return; // إلغاء
+
+            if (newName.trim() !== "") {
+                product.name = newName.trim();
+            }
+            if (newPrice.trim() !== "" && !isNaN(newPrice)) {
+                product.price = parseFloat(newPrice);
+            }
+
+            saveData();
+            renderProducts();
+            renderCart();
+        }
+
+        function deleteProduct(id) {
+            products = products.filter(p => p.id !== id);
+            saveData();
+            renderProducts();
+        }
+
+        renderProducts();
+        renderCart();
+    </script>
 </body>
 </html>
 
