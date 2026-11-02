@@ -1,1 +1,2 @@
 # aladdin-store
+# aitranslator
