@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب في AI ChatGPT</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin: 40px auto; max-width: 400px; text-align: right; }
+        h1 { text-align: center; color: #333; font-size: 22px; }
+        .btn { display: block; width: 100%; background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; margin-top: 15px; font-size: 16px; cursor: pointer; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .alert { background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center; font-size: 14px; }
+        .link { display: block; text-align: center; margin-top: 15px; color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>إنشاء حساب في AI ChatGPT 📝</h1>
+        
+        {% if message %}
+            <div class="alert">{{ message }}</div>
+        {% endif %}
+
+        <form method="POST">
+            <label>اسم المستخدم:</label>
+            <input type="text" name="username" placeholder="أدخل اسم المستخدم" required>
+
+            <label>كلمة المرور:</label>
+            <input type="password" name="password" placeholder="أدخل كلمة المرور" required>
+
+            <button type="submit" class="btn">تسجيل حساب</button>
+        </form>
+
+        <a href="/login" class="link">لديك حساب بالفعل؟ تسجيل الدخول</a>
+    </div>
+</body>
+</html>
+

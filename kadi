@@ -1,0 +1,106 @@
+#!/bin/bash
+
+# ألوان العرض
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+CYAN='\033[1;36m'
+YELLOW='\033[1;33m'
+PURPLE='\033[1;35m'
+BLUE='\033[1;34m'
+NC='\033[0m' # No Color
+
+clear
+
+# تصميم اسم معقد واحترافي (ASCII Art)
+echo -e "${PURPLE}██ ▄█▀ ▄▄▄▄███▄▄▄▄   ██████▄ ███████▄${NC}"
+echo -e "${PURPLE}██▄█▀   ▓██▀  ▀███▀  ███▀  ▀██ ███    ██${NC}"
+echo -e "${CYAN}███▅▄   ▓██    ███   ███    ██ ███    ██${NC}"
+echo -e "${CYAN}██ █▄   ▓██    ███   ▀███  ▄██ ███    ██${NC}"
+echo -e "${BLUE}▀█ █▀   ▓██    ███    ▀█████▀  ███████▀${NC}"
+echo -e "${YELLOW}       :: S E C   T O O L   v2.0 ::       ${NC}\n"
+
+# 1. التحقق من تحديثات الحزم
+echo -e "${GREEN}[*] جاري فحص وتحديث حزم النظام...${NC}"
+if command -v apt &> /dev/null; then
+    apt update -y && echo -e "${CYAN}    └── [✔] الحزم محدثة بنجاح.${NC}"
+elif command -v pkg &> /dev/null; then
+    pkg update -y && echo -e "${CYAN}    └── [✔] الحزم محدثة بنجاح.${NC}"
+fi
+
+# 2. فحص المنافذ المفتوحة والشبكة
+echo -e "\n${GREEN}[*] جاري فحص منافذ الشبكة المحلية (Localhost)...${NC}"
+if command -v nmap &> /dev/null; then
+    nmap -F 127.0.0.1
+else
+    echo -e "${RED}    └── [X] أداة nmap غير مثبتة (تثبيت: pkg install nmap).${NC}"
+fi
+
+# 3. تنظيم وإعداد مجلد التخزين (Storage)
+echo -e "\n${GREEN}[*] فحص إعدادات مسار التخزين الداخلي...${NC}"
+if command -v termux-setup-storage &> /dev/null; then
+    read -p "    └── هل تريد ربط صلاحيات التخزين بالهاتف؟ (y/n): " setup_stor
+    if [ "$setup_stor" = "y" ] || [ "$setup_stor" = "Y" ]; then
+        termux-setup-storage
+        echo -e "${CYAN}        └── [✔] تم ربط التخزين بنجاح.${NC}"
+    else
+        echo -e "${YELLOW}        └── [!] تم تخطي ربط التخزين.${NC}"
+    fi
+fi
+
+# 4. تنظيف الملفات المؤقتة لحماية الخصوصية
+echo -e "\n${GREEN}[*] جاري تنظيف الملفات المؤقتة والذاكرة العشوائية...${NC}"
+rm -rf ~/.cache/* 2>/dev/null
+echo -e "${CYAN}    └── [✔] تم تنظيف المخلفات وحماية الخصوصية.${NC}"
+
+# 5. إدارة أداة Zphisher
+echo -e "\n${PURPLE}══════════════════════════════════════════════════${NC}"
+echo -e "${CYAN} [1] إدارة أداة Zphisher${NC}"
+echo -e "${PURPLE}══════════════════════════════════════════════════${NC}"
+if [ -d "$HOME/zphisher" ]; then
+    echo -e "${GREEN}    └── [✔] الأداة مثبتة مسبقاً.${NC}"
+    echo -e "${YELLOW}    └── تشغيل يدوي: cd ~/zphisher && bash zphisher.sh${NC}"
+else
+    read -p "    └── هل تريد تثبيت Zphisher؟ (y/n): " inst_zph
+    if [ "$inst_zph" = "y" ] || [ "$inst_zph" = "Y" ]; then
+        pkg install git curl php proot -y
+        git clone https://github.com/htr-tech/zphisher.git "$HOME/zphisher"
+        echo -e "${GREEN}    └── [✔] تم تثبيت Zphisher بنجاح.${NC}"
+    fi
+fi
+
+# 6. إدارة أداة THC-Hydra
+echo -e "\n${PURPLE}══════════════════════════════════════════════════${NC}"
+echo -e "${CYAN} [2] إدارة أداة THC-Hydra${NC}"
+echo -e "${PURPLE}══════════════════════════════════════════════════${NC}"
+if command -v hydra &> /dev/null; then
+    echo -e "${GREEN}    └── [✔] الأداة مثبتة وجاهزة للاستخدام.${NC}"
+    echo -e "${YELLOW}    └── تشغيل يدوي: hydra${NC}"
+else
+    read -p "    └── هل تريد تثبيت Hydra؟ (y/n): " inst_hydra
+    if [ "$inst_hydra" = "y" ] || [ "$inst_hydra" = "Y" ]; then
+        pkg install hydra -y
+        echo -e "${GREEN}    └── [✔] تم تثبيت Hydra بنجاح.${NC}"
+    fi
+fi
+
+# 7. إدارة إطار عمل Metasploit
+echo -e "\n${PURPLE}══════════════════════════════════════════════════${NC}"
+echo -e "${CYAN} [3] إدارة إطار عمل Metasploit Framework${NC}"
+echo -e "${PURPLE}══════════════════════════════════════════════════${NC}"
+if command -v msfconsole &> /dev/null; then
+    echo -e "${GREEN}    └── [✔] الإطار مثبت وجاهز للاستخدام.${NC}"
+    echo -e "${YELLOW}    └── تشغيل يدوي: msfconsole${NC}"
+else
+    read -p "    └── هل تريد تثبيت Metasploit؟ (y/n): " inst_msf
+    if [ "$inst_msf" = "y" ] || [ "$inst_msf" = "Y" ]; then
+        echo -e "${YELLOW}    └── جاري التثبيت (قد يستغرق وقتاً طويلاً)...${NC}"
+        pkg install unstable-repo -y
+        pkg install metasploit -y
+        echo -e "${GREEN}    └── [✔] تم تثبيت Metasploit بنجاح.${NC}"
+    fi
+fi
+
+echo -e "\n${PURPLE}╔════════════════════════════════════════════════╗${NC}"
+echo -e "${PURPLE}║${GREEN}         [✔] اكتمل عمل سكريبت KADI بنجاح!       ${PURPLE}║${NC}"
+echo -e "${PURPLE}╚════════════════════════════════════════════════╝${NC}\n"
+

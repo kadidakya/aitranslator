@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع حفيظ دراجي - الأخبار الرياضية والكتب العربية</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; text-align: right; }
+        header { background: #1e1e1e; padding: 20px; border-radius: 10px; text-align: center; border-bottom: 3px solid #e50914; }
+        h1 { color: #e50914; margin: 0; }
+        .container { max-width: 800px; margin: 20px auto; }
+        .section-title { color: #ff4d4d; border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 30px; }
+        .article, .book-card { background: #1e1e1e; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #333; }
+        .article h3, .book-card h3 { color: #ff4d4d; margin-top: 0; }
+        .admin-btn { display: inline-block; background: #e50914; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>حفيظ دراجي - Hafid Derradji</h1>
+        <p>منصتك الرياضية الأولى للأخبار والكواليس ومكتبة الكتب العربية</p>
+    </header>
+    
+    <div class="container">
+        <!-- قسم المقالات الرياضية -->
+        <h2 class="section-title">آخر المقالات الرياضية</h2>
+        {% if articles %}
+            {% for art in articles %}
+                <div class="article">
+                    <h3>{{ art.title }}</h3>
+                    <p>{{ art.content }}</p>
+                    {% if art.image %}
+                        <img src="{{ art.image }}" alt="صورة المقال" style="max-width: 100%; border-radius: 5px; margin-top: 10px;">
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: #888; text-align: center;">لا توجد مقالات منشورة حالياً. أضف مقالك الأول من لوحة التحكم!</p>
+        {% endif %}
+
+        <!-- قسم الكتب العربية -->
+        <h2 class="section-title">مكتبة الكتب العربية</h2>
+        <div class="book-card">
+            <h3>في قلبي انثى عبرية</h3>
+            <p>رواية اجتماعية مميزة للكاتبة خولة حمدي تروي قصة حقيقية مليئة بالعبر والمشاعر الإنسانية المؤثرة.</p>
+        </div>
+        <div class="book-card">
+            <h3>الأسود يليق بك</h3>
+            <p>رواية رائعة للروائية أحلام مستغانمي تتناول تفاصيل قصة حب استثنائية وعميقة.</p>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="/admin" class="admin-btn">لوحة التحكم (إضافة مقال جديد)</a>
+        </div>
+    </div>
+</body>
+</html>
+

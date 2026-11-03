@@ -1,0 +1,56 @@
+cat << 'EOF' > bot.py
+import logging
+import random
+from telegram import Update
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
+
+# التوكن الشغال في السجل الخاص بك
+TOKEN = "8514063282:AAEVMmZrIj8xgmH_kGb-eAjC-xXLySPPax4"
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+
+HAFID_PHRASES = [
+    "يا سلام يا سلام يا سلام! 🎙️🔥 أين أنت يا هذا؟ كرة سريعة وتسديدة نارية!",
+    "عفوية وحماس كروي لا ينتهي! ليلة كروية ممتازة بكل المقاييس! ⚽",
+    "أوه بابا بابا بابا! ما هذا الجمال وما هذا الإبداع يا رائع! 🔥",
+    "في عقر دار المستديرة، لا مكان للتردد! انطلاقة هجومية كاسحة! 💥",
+    "هذا ليس مجرد كلام، هذه ملحمة كروية وتغطية استثنائية! 🎙️⚽",
+    "يا لها من لقطة! مباراة مجنونة سينمائية تشحب لها الأنفاس! 🌟"
+]
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_name = update.effective_user.first_name
+    welcome_message = (
+        f"أهلاً بك يا أخي {user_name} في عقر دار التعليق الحماسي! 🎙️🔥\n\n"
+        "أنا بوت معلقك المفضل **حفيظ دراجي**.\n"
+        "أرسل لي أي نص أو استفسار وسأرد عليك بروح التعليق الرياضي! ⚽🇩🇿"
+    )
+    await update.message.reply_text(welcome_message)
+
+async def hafid_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_text = update.message.text
+    intro = random.choice(HAFID_PHRASES)
+    
+    response = (
+        f"{intro}\n\n"
+        f"📌 **رسالتك:** «{user_text}»\n\n"
+        "«نتابع معكم هذه التغطية ويبقى الحماس والتشويق مستمراً حتى الدقيقة الأخيرة!» ⚽🔥"
+    )
+    await update.message.reply_text(response, parse_mode="Markdown")
+
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.ALL & (~filters.COMMAND), hafid_reply))
+
+    print("✅ تم تشغيل البوت بنجاح...")
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()
+EOF
+

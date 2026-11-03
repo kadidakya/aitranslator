@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - AI ChatGPT</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); margin-bottom: 20px; text-align: right; }
+        h1, h3 { color: #2c3e50; text-align: center; }
+        .btn { display: block; width: 100%; background: #28a745; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; text-align: center; font-weight: bold; margin-top: 10px; }
+        .btn-withdraw { background: #007bff; }
+        .btn-copy { background: #17a2b8; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0 15px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .alert { background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .balance-box { background: linear-gradient(135deg, #28a745, #218838); color: white; padding: 20px; border-radius: 10px; text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 20px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); }
+        .ref-box { background: #e9ecef; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .input-group { display: flex; gap: 8px; margin-bottom: 5px; }
+        .input-group input { margin: 0; }
+        .profile-section { display: flex; align-items: center; gap: 15px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        .avatar-img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #28a745; }
+        .friends-list { background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-top: 10px; max-height: 120px; overflow-y: auto; }
+        .logout-link { display: block; text-align: center; margin-top: 20px; color: #dc3545; text-decoration: none; font-weight: bold; }
+        #copyMsg { color: #28a745; font-size: 13px; font-weight: bold; display: none; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h1>لوحة تحكم AI ChatGPT 🤖</h1>
+            
+            {% if message %}
+                <div class="alert">{{ message }}</div>
+            {% endif %}
+
+            <!-- الملف الشخصي -->
+            <div class="profile-section">
+                {% if avatar == 'default.png' %}
+                    <img src="https://via.placeholder.com/70" alt="صورة الملف" class="avatar-img">
+                {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' + avatar) }}" alt="صورة الملف" class="avatar-img">
+                {% endif %}
+                <div>
+                    <h3 style="margin: 0 0 5px 0; text-align: right;">مرحباً، {{ username }}</h3>
+                    <p style="margin: 0; color: #666; font-size: 14px;">الجنس: <strong>{{ gender }}</strong></p>
+                </div>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="form_type" value="profile">
+                <label>تعديل الصورة الشخصية:</label>
+                <input type="file" name="avatar" accept="image/*">
+
+                <label>اختر الجنس:</label>
+                <select name="gender">
+                    <option value="ذكر" {% if gender == 'ذكر' %}selected{% endif %}>ذكر</option>
+                    <option value="أنثى" {% if gender == 'أنثى' %}selected{% endif %}>أنثى</option>
+                </select>
+
+                <button type="submit" class="btn">حفظ التعديلات الشخصية</button>
+            </form>
+        </div>
+
+        <!-- رصيد الأرباح -->
+        <div class="balance-box">
+            💰 رصيدك الحالي: ${{ "%.2f"|format(balance) }}
+        </div>
+
+        <!-- قسم الإحالات مع مربع وزر النسخ -->
+        <div class="card">
+            <h3>🔗 برنامج الإحالة والأصدقاء</h3>
+            <div class="ref-box">
+                <p style="margin: 0 0 8px 0; font-size: 14px; text-align: right;">رابط الإحالة الخاص بك:</p>
+                <div class="input-group">
+                    <input type="text" id="refLink" value="{{ referral_link }}" readonly>
+                    <button type="button" class="btn-copy" onclick="copyReferralLink()">نسخ 📋</button>
+                </div>
+                <div id="copyMsg">تم نسخ الرابط بنجاح! ✨</div>
+                <small style="color: #666; display: block; margin-top: 8px;">شارك هذا الرابط مع أصدقائك واربح $1.00 عن كل تسجيل!</small>
+            </div>
+
+            <h4 style="margin-bottom: 5px; text-align: right;">أصدقاؤك المسجلون ({{ referred_friends|length }}):</h4>
+            <div class="friends-list">
+                {% if referred_friends %}
+                    <ul style="margin: 0; padding-right: 20px; text-align: right;">
+                        {% for friend in referred_friends %}
+                            <li>{{ friend }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p style="margin: 0; text-align: center;">لم يسجل أي صديق عبر رابطك حتى الآن.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- طلب سحب الأرباح -->
+        <div class="card">
+            <h3>💸 طلب سحب الأرباح</h3>
+            <form method="POST">
+                <input type="hidden" name="form_type" value="withdraw">
+                <label for="withdrawal_method">اختر طريقة السحب:</label>
+                <select name="withdrawal_method" id="withdrawal_method" required>
+                    <option value="PayPal">PayPal (باي بال)</option>
+                    <option value="Binance">Binance ID / USDT (باينانس)</option>
+                    <option value="Visa Card">Visa Card (بطاقة فيزا)</option>
+                </select>
+
+                <label for="account_info">بريدك أو رقم الحساب / البطاقة:</label>
+                <input type="text" name="account_info" id="account_info" placeholder="مثال: email@gmail.com أو رقم الحساب" required>
+
+                <button type="submit" class="btn btn-withdraw">إرسال طلب السحب</button>
+            </form>
+        </div>
+
+        <a href="/logout" class="logout-link">تسجيل الخروج</a>
+    </div>
+
+    <!-- دالة JavaScript لنسخ الرابط -->
+    <script>
+        function copyReferralLink() {
+            var copyText = document.getElementById("refLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(copyText.value);
+
+            var msg = document.getElementById("copyMsg");
+            msg.style.display = "block";
+            setTimeout(function() {
+                msg.style.display = "none";
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
+

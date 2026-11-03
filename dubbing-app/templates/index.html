@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة الدبلجة وتعديل الفيديو</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background: #121212; color: #fff; padding: 15px; margin: 0; }
+        .card { background: #1e1e1e; padding: 20px; border-radius: 12px; max-width: 600px; margin: 0 auto; }
+        h2 { text-align: center; color: #00e676; margin-top: 0; }
+        .field { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="file"], textarea, select, input[type="text"] { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+        textarea { height: 80px; resize: vertical; }
+        .slider-group { background: #282828; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+        .slider-group label { display: flex; justify-content: space-between; font-size: 0.9em; }
+        input[type="range"] { width: 100%; margin-top: 5px; }
+        button { width: 100%; padding: 12px; background: #00e676; color: #000; border: none; font-weight: bold; font-size: 16px; border-radius: 8px; cursor: pointer; }
+        button:disabled { background: #555; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; }
+        #downloadBtn { display: none; background: #29b6f6; margin-top: 10px; text-decoration: none; text-align: center; line-height: 45px; height: 45px; border-radius: 8px; font-weight: bold; color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>توليد الصوت ودبلجة الفيديو</h2>
+    <form id="dubForm">
+        <div class="field">
+            <label>اختر الفيديو الأصلي:</label>
+            <input type="file" id="video" accept="video/*" required>
+        </div>
+
+        <div class="field">
+            <label>النص المترجم للغة المطلوبة:</label>
+            <textarea id="script_text" placeholder="اكتب النص الإنجليزي أو الفرنسي هنا..." required></textarea>
+        </div>
+
+        <div class="field">
+            <label>اللغة والصوت:</label>
+            <select id="language">
+                <option value="en-male">إنجليزي - رجل (Christopher)</option>
+                <option value="en-female">إنجليزي - امرأة (Jenny)</option>
+                <option value="fr-male">فرنسي - رجل (Henri)</option>
+                <option value="fr-female">فرنسي - امرأة (Denise)</option>
+            </select>
+        </div>
+
+        <hr style="border-color: #333; margin: 20px 0;">
+        <h3>تعديل الفلاتر والألوان يدوياً</h3>
+
+        <div class="slider-group">
+            <label>السطوع (Brightness): <span id="v_bright">1.0</span></label>
+            <input type="range" id="brightness" min="0.5" max="1.5" step="0.05" value="1.0" oninput="v_bright.innerText=this.value">
+        </div>
+
+        <div class="slider-group">
+            <label>التباين (Contrast): <span id="v_contrast">1.0</span></label>
+            <input type="range" id="contrast" min="0.5" max="2.0" step="0.05" value="1.0" oninput="v_contrast.innerText=this.value">
+        </div>
+
+        <div class="slider-group">
+            <label>تشبع الألوان (Saturation): <span id="v_sat">1.0</span></label>
+            <input type="range" id="saturation" min="0.0" max="2.0" step="0.1" value="1.0" oninput="v_sat.innerText=this.value">
+        </div>
+
+        <div class="slider-group">
+            <label>الحدة (Sharpness): <span id="v_sharp">0.0</span></label>
+            <input type="range" id="sharpness" min="0.0" max="2.0" step="0.1" value="0.0" oninput="v_sharp.innerText=this.value">
+        </div>
+
+        <button type="submit" id="submitBtn">معالجة الفيديو وحفظه</button>
+    </form>
+
+    <div id="status"></div>
+    <a id="downloadBtn" href="#" download>تحميل الفيديو إلى ذاكرة الهاتف</a>
+
+    <!-- مربع نسخ رابط الموقع المضاف حديثاً -->
+    <div style="margin-top: 25px; border-top: 1px solid #333; padding-top: 15px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #00e676;">رابط موقعك الحالي:</label>
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="currentSiteLink" readonly>
+            <button type="button" onclick="copyCurrentLink()" style="width: auto; padding: 10px 20px; background: #00e676; color: #000; border: none; font-weight: bold; border-radius: 8px; cursor: pointer;">نسخ</button>
+        </div>
+        <span id="copyMsg" style="display: block; margin-top: 5px; font-size: 12px; color: #29b6f6; height: 15px; text-align: center;"></span>
+    </div>
+</div>
+
+<script>
+// وضع رابط الموقع الحالي تلقائياً في الحقل
+document.getElementById("currentSiteLink").value = window.location.href;
+
+function copyCurrentLink() {
+    const linkInput = document.getElementById("currentSiteLink");
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(linkInput.value);
+    
+    const msg = document.getElementById("copyMsg");
+    msg.innerText = "تم نسخ رابط الموقع بنجاح! 📋";
+    setTimeout(() => {
+        msg.innerText = "";
+    }, 3000);
+}
+
+// كود معالجة النموذج (Form)
+document.getElementById('dubForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    status.innerText = "جاري المعالجة وتوليد الصوت... يرجى الانتظار";
+    status.style.color = "#FFC107";
+    submitBtn.disabled = true;
+    downloadBtn.style.display = "none";
+
+    const formData = new FormData();
+    formData.append('video', document.getElementById('video').files[0]);
+    formData.append('script_text', document.getElementById('script_text').value);
+    formData.append('language', document.getElementById('language').value);
+    formData.append('brightness', document.getElementById('brightness').value);
+    formData.append('contrast', document.getElementById('contrast').value);
+    formData.append('saturation', document.getElementById('saturation').value);
+    formData.append('sharpness', document.getElementById('sharpness').value);
+
+    try {
+        const res = await fetch('/process', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (res.ok) {
+            status.innerText = "تمت المعالجة بنجاح!";
+            status.style.color = "#00e676";
+            downloadBtn.href = data.download_url;
+            downloadBtn.style.display = "block";
+        } else {
+            status.innerText = "خطأ: " + data.error;
+            status.style.color = "#ff5252";
+        }
+    } catch (err) {
+        status.innerText = "حدث خطأ أثناء الاتصال بالسيرفر";
+        status.style.color = "#ff5252";
+    } finally {
+        submitBtn.disabled = false;
+    }
+});
+</script>
+</body>
+</html>
+
